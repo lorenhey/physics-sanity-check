@@ -1,0 +1,21 @@
+context:
+  domain: fluid_mechanics
+  model: incompressible
+
+quantities:
+  velocity:
+    value: 180
+    unit: m/s
+    phys_type: generic
+    
+  sound_speed:
+    value: 343
+    unit: m/s
+    phys_type: generic
+
+  inlet_pressure:
+    value: -15000
+    unit: Pa
+    phys_type: absolute_pressure
+    is_absolute: true
+    is_gauge: false

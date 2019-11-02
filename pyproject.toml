@@ -21,3 +21,5 @@ dev = [
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
 ]
+[project.scripts]
+psc = "physics_sanity_check.cli:app"

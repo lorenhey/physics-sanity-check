@@ -1,0 +1,23 @@
+context:
+  domain: astrophysics
+  system: earth
+  model: newtonian
+
+quantities:
+  earth_escape_velocity:
+    value: 11.2
+    unit: m/s
+    phys_type: generic
+    description: "Calculated escape velocity of Earth"
+
+  thermal_efficiency:
+    value: 1.36
+    unit: ""
+    phys_type: efficiency
+    description: "Thermal efficiency of a closed cycle"
+
+  star_surface_temp:
+    value: -300
+    unit: degC
+    phys_type: absolute_temperature
+    description: "Surface temperature of a star"
