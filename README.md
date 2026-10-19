@@ -1,67 +1,71 @@
 # physics-sanity-check
 
-> El cálculo terminó y produjo un número. ¿Ese número tiene sentido físico?
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Inspector-brightgreen?style=flat-square&logo=github)](https://lorenhey.github.io/physics-sanity-check/)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue?style=flat-square)](https://github.com/lorenhey/physics-sanity-check)
+[![Python](https://img.shields.io/badge/python->=3.12-blue?style=flat-square&logo=python)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-`physics-sanity-check` detecta resultados físicamente sospechosos que pueden pasar una validación matemática y dimensional convencional.
+> *El cálculo terminó y produjo un número. ¿Ese número tiene sentido físico?*  
+> **"Dimensionalmente correcto" no significa "físicamente razonable".**
 
-Un resultado puede ser dimensionalmente correcto, numéricamente estable y, sin embargo, físicamente absurdo. Esta herramienta actúa como una capa por encima de las unidades y los tipos, razonando sobre escalas físicas, regímenes, condiciones de aplicabilidad y leyes de conservación, mediante un motor estructurado de plausibilidad física.
+`physics-sanity-check` detecta resultados físicamente sospechosos o absurdos que superan sin problemas una validación matemática y dimensional convencional.
 
-## Visión del Proyecto
+Probá el auditor interactivo en tu navegador:  
+👉 **[https://lorenhey.github.io/physics-sanity-check/](https://lorenhey.github.io/physics-sanity-check/)**
 
-El principio rector es: **"Dimensionalmente correcto" no significa "físicamente razonable".**
+---
 
-Ejemplos que esta herramienta busca detectar (o ayudar a detectar en sistemas acoplados):
-- Una eficiencia de 138%.
-- Una presión absoluta negativa (e.g. -15 kPa (a)).
-- Un Mach de 0.8 en un modelo etiquetado como `incompressible`.
-- Una velocidad orbital para la Tierra de 11.2 m/s (sugiriendo un clásico error de km/s confundido con m/s).
+## 🎯 Visión y Problemática
 
-## Características
+Un cálculo puede ser dimensionalmente impecable, numéricamente estable y, sin embargo, describir un absurdo físico:
+- Una eficiencia de máquina del $138\%$ ($\eta > 1$).
+- Una presión absoluta negativa (ej. $-25 \text{ kPa}$ absolutos por confundir vacío manométrico).
+- Un número de Mach de $0.82$ evaluado bajo un modelo etiquetado como `incompressible` ($Ma > 0.3$).
+- Una velocidad de escape de la Tierra calculada en $11.2 \text{ m/s}$ (el clásico error de factor $1000$ al confundir $\text{km/s}$ con $\text{m/s}$).
+- Un perno de acero con una tensión de tracción de $450 \text{ GPa}$ (superando la resistencia cohesiva teórica de los enlaces atómicos de Griffith).
 
-- **Contexto Físico:** Las reglas se evalúan según un `domain`, `system`, `model`, y `assumptions`.
-- **Order of Magnitude Checks:** Compara los resultados con una biblioteca curada de escalas de referencia.
-- **Regime Checks:** Valida suposiciones como "incompresible" evaluando el número de Mach resultante.
-- **Metamorphic Testing (Probing):** `psc probe` genera perturbaciones físicas válidas (como un unit roundtrip) y comprueba si el modelo es invariante a cambios que deberían ser equivalentes, lo cual es excelente para detectar bugs de constantes "hardcodeadas" o mal uso de unidades.
-- **Common-Error Signatures:** Los "warnings" explican qué se detectó, contra qué regla, y sugieren posibles causas. La regla compara el resultado con la escala esperada para el contexto seleccionado.
-- **Sin falsos umbrales globales:** Todo umbral es configurable. Una diferencia de 100x puede ser normal en cosmología y un absurdo en ingeniería civil.
+`physics-sanity-check` actúa como un auditor semántico de plausibilidad física, razonando sobre escalas naturales, regímenes, condiciones de aplicabilidad y leyes de conservación.
 
-## Instalación
+---
 
-Instala el proyecto con `uv`:
+## ⚡ Características Principales
+
+- **Auditor Web Interactivo (Zero-Backend)**: Suite SPA para navegador en HTML5, CSS3, JavaScript y KaTeX.
+- **Motor de Reglas de Plausibilidad Extensible**:
+  - *Límites Absolutos*: Eficiencia ($0 \le \eta \le 1$), temperatura absoluta ($T \ge 0 \text{ K}$), presión absoluta ($p_{abs} \ge 0 \text{ Pa}$), velocidad relativista ($v < c$).
+  - *Límites de Régimen*: Hipótesis incompresible ($Ma \le 0.3$), velocidades en tuberías industriales (riesgo de erosión, golpe de ariete o sedimentación).
+  - *Límites de Material*: Tensiones máximas admisibles frente al límite teórico de Griffith ($\sim E/10$).
+- **Chequeo de Órdenes de Magnitud ($OOM$)**: Comparación logarítmica $\log_{10}(Q / Q_{ref})$ contra una biblioteca curada de escalas de la naturaleza con diagnóstico de causas probables (factores $10^3$, prefijos métricos, etc.).
+- **Visualizador en Escala Logarítmica**: Gráfico interactivo que sitúa el resultado del usuario en relación con las escalas del universo y de la ingeniería de planta.
+- **Metamorphic Probing Lab**: Aplica perturbaciones unitarias a las funciones de cálculo (ej. $\text{m} \rightarrow \text{mm}$) y verifica si la salida conserva su invariancia física, detectando constantes con unidades implícitas hardcodeadas.
+- **Terminal Web CLI**: Emulador interactivo para ejecutar comandos nativos de `psc` en el navegador.
+
+---
+
+## 🚀 Instalación Local
+
+Gestionado con [`uv`](https://docs.astral.sh/uv/):
 
 ```bash
-uv tool install .
-# o
+# Clonar repositorio
+git clone https://github.com/lorenhey/physics-sanity-check.git
+cd physics-sanity-check
+
+# Sincronizar dependencias
 uv sync
 ```
 
-## Uso Rápido (CLI)
+---
 
-### Sanity Check de un caso
+## 💻 Uso de la Línea de Comandos (CLI)
 
-Un caso se define en YAML:
-
-```yaml
-context:
-  domain: astrophysics
-  system: earth
-  model: newtonian
-
-quantities:
-  earth_escape_velocity:
-    value: 11.2
-    unit: m/s
-    phys_type: generic
-```
-
-Ejecutar:
-
+### 1. Auditar un Caso YAML
 ```bash
-psc check case.yaml
+uv run psc check examples/case1.yaml
 ```
 
-Salida esperada:
-```
+Salida:
+```text
 +---------------------- WARNING - OOM-CHECK-001 ----------------------+
 | Value for earth_escape_velocity (11.2 m/s) is ~10^-3 times the      |
 | reference scale for earth (11186.0 m/s).                            |
@@ -73,21 +77,23 @@ Salida esperada:
 +---------------------------------------------------------------------+
 ```
 
-### Metamorphic Probing
-
-Comprueba si tu función de simulación sobrevive a un unit-roundtrip (ej. cambiar los inputs de masa de `kg` a `g` conservando su significado físico):
-
+### 2. Metamorphic Probing de Modelos
 ```bash
-psc probe my_model.py calculate_trajectory my_case.yaml
+uv run psc probe examples/model.py fake_gravity_model examples/case1.yaml
 ```
 
-## Reglas (Rule Packs)
+---
 
-- **Common:** Límites de eficiencia (0 a 1), positividad de temperatura absoluta.
-- **Order of Magnitude (OOM):** Escalas curadas (por ej. `earth_radius`, `walking_speed`, `room_temperature`).
-- **Fluids (Fluid Mechanics):** Restricciones de presión absoluta, límites de Mach para incompresibilidad.
-- *Más reglas en desarrollo (Thermodynamics, Mechanics, Electromagnetism, etc.)*
+## 🧪 Tests y Validación
 
-## Licencia
+```bash
+uv run pytest
+```
 
-MIT.
+---
+
+## 📜 Licencia
+
+Distribuido bajo la Licencia MIT. Consulta `LICENSE` para más detalles.
+
+Desarrollado con rigor ingenieril por **Loren Hey** (2026).

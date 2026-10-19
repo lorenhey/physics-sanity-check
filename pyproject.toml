@@ -1,7 +1,7 @@
 [project]
 name = "physics-sanity-check"
-version = "0.1.0"
-description = "Add your description here"
+version = "2.1.0"
+description = "Computational engine and interactive web laboratory for physical sanity, plausibility checks, and metamorphic testing"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
